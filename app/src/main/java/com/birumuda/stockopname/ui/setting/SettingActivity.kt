@@ -26,7 +26,7 @@ class SettingActivity : AppCompatActivity() {
     private val sessionManager by lazy { SessionManager(this) }
 
     private val prefs by lazy {
-        getSharedPreferences("app_setting", Context.MODE_PRIVATE)
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,20 +116,20 @@ class SettingActivity : AppCompatActivity() {
      * Load setting saat Activity dibuka
      */
     private fun loadSetting() {
-        etSiteCode.setText(prefs.getString("site_code", ""))
-        etBrandCode.setText(prefs.getString("brand_code", ""))
+        etSiteCode.setText(prefs.getString(KEY_SITE_CODE, ""))
+        etBrandCode.setText(prefs.getString(KEY_BRAND_CODE, ""))
 
-        val workingTypeName = prefs.getString("working_type", WorkingTypes.NONE.name)
+        val workingTypeName = prefs.getString(KEY_WORKING_TYPE, WorkingTypes.NONE.name)
         val workingTypeIndex = WorkingTypes.entries.indexOfFirst { it.name == workingTypeName }
             .coerceAtLeast(0)
         spWorkingType.setSelection(workingTypeIndex)
 
-        val barcodeReaderName = prefs.getString("barcode_reader", BarcodeScannerOptions.SCANNER.name)
+        val barcodeReaderName = prefs.getString(KEY_BARCODE_READER, BarcodeScannerOptions.SCANNER.name)
         val barcodeIndex = BarcodeScannerOptions.entries.indexOfFirst { it.name == barcodeReaderName }
             .coerceAtLeast(0)
         spBarcodeReader.setSelection(barcodeIndex)
 
-        val printerPrefix = prefs.getString("printer_prefix", "")
+        val printerPrefix = prefs.getString(KEY_PRINTER_PREFIX, "")
         val printerIndex = PrinterOptions.entries.indexOfFirst { it.prefix == printerPrefix }
             .coerceAtLeast(0)
         spPrinter.setSelection(printerIndex)
@@ -147,11 +147,11 @@ class SettingActivity : AppCompatActivity() {
         val selectedPrinter = PrinterOptions.entries[spPrinter.selectedItemPosition]
 
         prefs.edit().apply {
-            putString("site_code", etSiteCode.text.toString())
-            putString("brand_code", etBrandCode.text.toString())
-            putString("working_type", selectedWorkingType.name)
-            putString("barcode_reader", selectedBarcodeReader.name)
-            putString("printer_prefix", selectedPrinter.prefix)
+            putString(KEY_SITE_CODE, etSiteCode.text.toString())
+            putString(KEY_BRAND_CODE, etBrandCode.text.toString())
+            putString(KEY_WORKING_TYPE, selectedWorkingType.name)
+            putString(KEY_BARCODE_READER, selectedBarcodeReader.name)
+            putString(KEY_PRINTER_PREFIX, selectedPrinter.prefix)
             apply()
         }
     }
@@ -169,5 +169,14 @@ class SettingActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object {
+        const val PREFS_NAME = "app_setting"
+        const val KEY_SITE_CODE = "site_code"
+        const val KEY_BRAND_CODE = "brand_code"
+        const val KEY_WORKING_TYPE = "working_type"
+        const val KEY_BARCODE_READER = "barcode_reader"
+        const val KEY_PRINTER_PREFIX = "printer_prefix"
     }
 }

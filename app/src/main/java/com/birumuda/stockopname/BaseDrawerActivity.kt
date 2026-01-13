@@ -79,8 +79,8 @@ abstract class BaseDrawerActivity : BaseActivity(),
 	}
 
 	private fun filterMenuByWorkingType() {
-		val prefs = getSharedPreferences("app_setting", Context.MODE_PRIVATE)
-		val workingType = prefs.getString("working_type", WorkingTypes.NONE.name)
+		val prefs = getSharedPreferences(SettingActivity.PREFS_NAME, Context.MODE_PRIVATE)
+		val workingType = prefs.getString(SettingActivity.KEY_WORKING_TYPE, WorkingTypes.NONE.name)
 
 		val menu = navigationView.menu
 		menu.findItem(R.id.menu_opname).isVisible = workingType == WorkingTypes.OPNAME.name

@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.birumuda.stockopname.data.model.BarcodeScannerOptions
 import com.birumuda.stockopname.data.model.PrintLabelMode
 import com.birumuda.stockopname.ui.ScannerCameraFragment
+import com.birumuda.stockopname.ui.setting.SettingActivity
 import com.birumuda.stockopname.utils.BarcodeReader
 
 abstract class BaseScannerActivity : BaseDrawerActivity() {
@@ -43,7 +44,7 @@ abstract class BaseScannerActivity : BaseDrawerActivity() {
     }
 
     protected fun updateScannerVisibility() {
-        val prefs = getSharedPreferences("app_setting", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(SettingActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val barcodeReaderName = prefs.getString("barcode_reader", BarcodeScannerOptions.SCANNER.name)
         isUseCamera = BarcodeScannerOptions.entries.find { it.name == barcodeReaderName }?.isUseCamera ?: false
 

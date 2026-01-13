@@ -106,7 +106,8 @@ class ScannerCameraFragment : Fragment() {
 	private fun startScanning() {
 		isScanning = true
 		btnScan.text = getString(R.string.btn_scan_active)
-		btnScan.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
+		btnScan.setTextColor(ContextCompat.getColor(requireContext(), R.color.scan_button_active_text))
+		btnScan.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.scan_button_active))
 		scannerLine.visibility = View.VISIBLE
 		startBlinkAnimation()
 	}
@@ -114,7 +115,8 @@ class ScannerCameraFragment : Fragment() {
 	private fun stopScanning() {
 		isScanning = false
 		btnScan.text = getString(R.string.btn_scan_idle)
-		btnScan.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.dark_red))
+		btnScan.setTextColor(ContextCompat.getColor(requireContext(), R.color.scan_button_idle_text))
+		btnScan.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.scan_button_idle))
 		scannerLine.visibility = View.GONE
 		stopBlinkAnimation()
 	}
