@@ -32,7 +32,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
 		activity.lifecycleScope.launch {
 			holdBarcodeReader(true)
 			val resultFragment =
-				activity.supportFragmentManager.findFragmentById(R.id.fragment_printlabel_result) as? ScannerResultFragment
+				activity.supportFragmentManager.findFragmentById(R.id.fragment_scanner_result) as? ScannerResultFragment
 			resultFragment?.setError(null)
 
 			try {
@@ -99,11 +99,11 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
 	fun holdBarcodeReader(hold: Boolean) {
 		if (activity.isUseCamera) {
 			val cameraFragment =
-				activity.supportFragmentManager.findFragmentById(R.id.fragment_printlabel_camera) as? ScannerCameraFragment
+				activity.supportFragmentManager.findFragmentById(R.id.fragment_scanner_camera) as? ScannerCameraFragment
 			cameraFragment?.setHold(hold)
 		} else {
 			val barcodeFragment =
-				activity.supportFragmentManager.findFragmentById(R.id.fragment_printlabel_barcode) as? ScannerBarcodeFragment
+				activity.supportFragmentManager.findFragmentById(R.id.fragment_scanner_barcode) as? ScannerBarcodeFragment
 			barcodeFragment?.setHold(hold)
 		}
 	}
