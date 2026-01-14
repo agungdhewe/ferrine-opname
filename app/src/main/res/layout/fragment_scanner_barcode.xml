@@ -1,32 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp"
+    android:layout_margin="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center_horizontal"
-        >
-
-        <TextView
-            android:id="@+id/tvScannerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scan via Barcode Scanner"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:layout_marginBottom="8dp"/>
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,30 +21,35 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <EditText
-                android:id="@+id/etBarcode"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBarcode"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Scan barcode di sini"
-                android:inputType="text"
-                android:imeOptions="actionDone"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:background="@android:drawable/edit_text"
-                android:padding="10dp"/>
+                android:hint="Ketik barcode di sini">
 
-            <ImageButton
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBarcode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubmitBarcode"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                style="@style/Widget.Material3.Button.IconButton.Filled"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:layout_marginStart="8dp"
-                android:background="@android:drawable/btn_default"
-                android:src="@android:drawable/ic_menu_send"
+                app:icon="@android:drawable/ic_menu_send"
                 android:contentDescription="Submit" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

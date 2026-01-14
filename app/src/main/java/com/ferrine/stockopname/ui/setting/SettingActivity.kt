@@ -18,6 +18,7 @@ import com.ferrine.stockopname.data.model.BarcodeScannerOptions
 import com.ferrine.stockopname.data.model.PrinterOptions
 import com.ferrine.stockopname.data.model.WorkingTypes
 import com.ferrine.stockopname.utils.SessionManager
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -26,9 +27,15 @@ class SettingActivity : AppCompatActivity() {
     private lateinit var tilSiteCode: TextInputLayout
     private lateinit var tilBrandCode: TextInputLayout
     private lateinit var tilWorkingType: TextInputLayout
+    private lateinit var tilDeviceId: TextInputLayout
+    private lateinit var tilServerAddress: TextInputLayout
     
     private lateinit var etSiteCode: TextInputEditText
     private lateinit var etBrandCode: TextInputEditText
+    private lateinit var etDeviceId: TextInputEditText
+    private lateinit var etServerAddress: TextInputEditText
+    private lateinit var cbUseCentralServer: MaterialCheckBox
+    
     private lateinit var spWorkingType: AutoCompleteTextView
     private lateinit var spBarcodeReader: AutoCompleteTextView
     private lateinit var spPrinter: AutoCompleteTextView
@@ -69,9 +76,15 @@ class SettingActivity : AppCompatActivity() {
         tilSiteCode = findViewById(R.id.tilSiteCode)
         tilBrandCode = findViewById(R.id.tilBrandCode)
         tilWorkingType = findViewById(R.id.tilWorkingType)
+        tilDeviceId = findViewById(R.id.tilDeviceId)
+        tilServerAddress = findViewById(R.id.tilServerAddress)
         
         etSiteCode = findViewById(R.id.etSiteCode)
         etBrandCode = findViewById(R.id.etBrandCode)
+        etDeviceId = findViewById(R.id.etDeviceId)
+        etServerAddress = findViewById(R.id.etServerAddress)
+        cbUseCentralServer = findViewById(R.id.cbUseCentralServer)
+        
         spWorkingType = findViewById(R.id.spWorkingType)
         spBarcodeReader = findViewById(R.id.spBarcodeReader)
         spPrinter = findViewById(R.id.spPrinter)
@@ -82,6 +95,15 @@ class SettingActivity : AppCompatActivity() {
         btnResetData.setOnClickListener {
             showResetConfirmationDialog()
         }
+        
+        cbUseCentralServer.setOnCheckedChangeListener { _, isChecked ->
+            updateServerAddressEnableState(isChecked)
+        }
+    }
+    
+    private fun updateServerAddressEnableState(isCentralServerChecked: Boolean) {
+        val isAdmin = sessionManager.isAdmin
+        tilServerAddress.isEnabled = isAdmin && isCentralServerChecked
     }
 
     private fun showResetConfirmationDialog() {
@@ -114,6 +136,11 @@ class SettingActivity : AppCompatActivity() {
         tilBrandCode.isEnabled = !isLoggedIn
         tilWorkingType.isEnabled = !isLoggedIn
 
+        // Tambahan fitur Admin
+        tilDeviceId.isEnabled = isAdmin
+        cbUseCentralServer.isEnabled = isAdmin
+        updateServerAddressEnableState(cbUseCentralServer.isChecked)
+
         // Tombol Reset Data hanya muncul jika Admin dan sudah Login
         btnResetData.visibility = if (isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }
@@ -141,6 +168,10 @@ class SettingActivity : AppCompatActivity() {
     private fun loadSetting() {
         etSiteCode.setText(prefs.getString(KEY_SITE_CODE, ""))
         etBrandCode.setText(prefs.getString(KEY_BRAND_CODE, ""))
+        etDeviceId.setText(prefs.getString(KEY_DEVICE_ID, ""))
+        
+        cbUseCentralServer.isChecked = prefs.getBoolean(KEY_USE_CENTRAL_SERVER, false)
+        etServerAddress.setText(prefs.getString(KEY_SERVER_ADDRESS, ""))
 
         val workingTypeName = prefs.getString(KEY_WORKING_TYPE, WorkingTypes.NONE.name)
         val workingType = WorkingTypes.entries.find { it.name == workingTypeName } ?: WorkingTypes.NONE
@@ -171,6 +202,10 @@ class SettingActivity : AppCompatActivity() {
         prefs.edit().apply {
             putString(KEY_SITE_CODE, etSiteCode.text.toString())
             putString(KEY_BRAND_CODE, etBrandCode.text.toString())
+            putString(KEY_DEVICE_ID, etDeviceId.text.toString())
+            putBoolean(KEY_USE_CENTRAL_SERVER, cbUseCentralServer.isChecked)
+            putString(KEY_SERVER_ADDRESS, etServerAddress.text.toString())
+            
             putString(KEY_WORKING_TYPE, selectedWorkingType.name)
             putString(KEY_BARCODE_READER, selectedBarcodeReader.name)
             putString(KEY_PRINTER_PREFIX, selectedPrinter.prefix)
@@ -200,5 +235,8 @@ class SettingActivity : AppCompatActivity() {
         const val KEY_WORKING_TYPE = "working_type"
         const val KEY_BARCODE_READER = "barcode_reader"
         const val KEY_PRINTER_PREFIX = "printer_prefix"
+        const val KEY_DEVICE_ID = "device_id"
+        const val KEY_USE_CENTRAL_SERVER = "use_central_server"
+        const val KEY_SERVER_ADDRESS = "server_address"
     }
 }

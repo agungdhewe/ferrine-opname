@@ -46,7 +46,7 @@ class AppDatabaseHelper(context: Context) :
 
 	private fun insertDummyUsers(db: SQLiteDatabase) {
 		// agung isAdmin = false dan allowOpname
-		insertUser(db, "agung", "Agung Nugroho", "rahasia", 
+		insertUser(db, "user", "User", "user",
 			isAdmin = false, allowOpname = true, allowReceiving = false, allowTransfer = false, allowPrintlabel = false)
 		
 		// admin isAdmin = true, dan allow all

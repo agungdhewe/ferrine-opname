@@ -3,6 +3,7 @@ package com.ferrine.stockopname.ui.login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -65,6 +66,7 @@ class LoginActivity : AppCompatActivity() {
 		val workingTypeName = prefs.getString(SettingActivity.KEY_WORKING_TYPE, WorkingTypes.NONE.name)
 		val workingType = WorkingTypes.entries.find { it.name == workingTypeName } ?: WorkingTypes.NONE
 		tvWorkingTypeTitle.text = workingType.displayName
+		tvWorkingTypeTitle.visibility = if (workingType == WorkingTypes.NONE) View.GONE else View.VISIBLE
 	}
 
 	private fun initAction() {

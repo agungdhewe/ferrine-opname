@@ -1,36 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/bg_rounded_light_grey"
-    android:padding="12dp"
-    android:gravity="center_horizontal">
-    <!-- Catatan: bg_rounded_light_grey adalah opsional untuk memberi bingkai pada area camera -->
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp"
+    android:layout_margin="4dp">
 
-    <TextView
-        android:id="@+id/tvCameraTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/tvErrorMessage"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FF0000"
-        android:textSize="14sp"
-        android:textStyle="italic"
-        android:visibility="gone"
-        android:gravity="center"
-        tools:text="Error: Barcode not found"
-        tools:visibility="visible" />
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvCameraTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scan Result"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorError"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textStyle="italic"
+            android:visibility="gone"
+            android:gravity="center"
+            tools:text="Error: Barcode not found"
+            tools:visibility="visible" />
+
+        <!-- Container for dynamic results can be added here -->
+        <LinearLayout
+            android:id="@+id/resultContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -84,11 +84,18 @@ abstract class BaseDrawerActivity : BaseActivity(),
 		val workingType = prefs.getString(SettingActivity.KEY_WORKING_TYPE, WorkingTypes.NONE.name)
 
 		val menu = navigationView.menu
-		menu.findItem(R.id.menu_opname).isVisible = workingType == WorkingTypes.OPNAME.name
-		menu.findItem(R.id.menu_receiving).isVisible = workingType == WorkingTypes.RECEIVING.name
-		menu.findItem(R.id.menu_transfer).isVisible = workingType == WorkingTypes.TRANSFER.name
-		menu.findItem(R.id.menu_print_label).isVisible = workingType == WorkingTypes.PRINTLABEL.name
-		
+        if (sessionManager.isAdmin) {
+            menu.findItem(R.id.menu_opname).isVisible = false
+            menu.findItem(R.id.menu_receiving).isVisible = false
+            menu.findItem(R.id.menu_transfer).isVisible = false
+            menu.findItem(R.id.menu_print_label).isVisible = false
+        } else {
+            menu.findItem(R.id.menu_opname).isVisible = workingType == WorkingTypes.OPNAME.name
+            menu.findItem(R.id.menu_receiving).isVisible = workingType == WorkingTypes.RECEIVING.name
+            menu.findItem(R.id.menu_transfer).isVisible = workingType == WorkingTypes.TRANSFER.name
+            menu.findItem(R.id.menu_print_label).isVisible = workingType == WorkingTypes.PRINTLABEL.name
+        }
+
 		// Menu User hanya muncul untuk Admin
 		menu.findItem(R.id.menu_user).isVisible = sessionManager.isAdmin
 		

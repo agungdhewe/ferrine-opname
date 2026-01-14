@@ -5,7 +5,7 @@
     <color name="scan_button_active">#FF0000</color>
     <color name="scan_button_active_text">#FFFFFFFF</color>
     <color name="scan_button_idle">#8B0000</color>
-    <color name="scan_button_idle_text">#9D5D5D</color>
+    <color name="scan_button_idle_text">#E6B5B5</color>
 
 
     <color name="black">#FF000000</color>

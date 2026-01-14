@@ -11,8 +11,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        app:titleTextColor="@color/white"
-        app:navigationIconTint="@color/white"
+        app:title="User Management"
+        app:titleTextColor="@android:color/white"
+        app:navigationIconTint="@android:color/white"
         android:theme="@style/ThemeOverlay.Material3.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +35,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        app:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="Add User" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

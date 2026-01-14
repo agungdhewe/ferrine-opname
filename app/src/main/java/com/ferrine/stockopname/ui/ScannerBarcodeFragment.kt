@@ -7,18 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.ImageButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.ferrine.stockopname.BaseScannerActivity
 import com.ferrine.stockopname.R
+import com.google.android.material.button.MaterialButton
 
 class ScannerBarcodeFragment : Fragment() {
 
 	private lateinit var etBarcode: EditText
-	private lateinit var btnSubmitBarcode: ImageButton
+	private lateinit var btnSubmitBarcode: MaterialButton
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?,
