@@ -18,4 +18,9 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         cursor.close()
         return count
     }
+
+    fun deleteAll() {
+        val db = dbHelper.writableDatabase
+        db.delete(DbContract.OpnameTable.TABLE_NAME, null, null)
+    }
 }

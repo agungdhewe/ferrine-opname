@@ -1,7 +1,10 @@
 package com.ferrine.stockopname.ui.item
 
+import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -26,6 +29,11 @@ class ItemActivity : BaseDrawerActivity() {
     private val itemRepository by lazy { ItemRepository(this) }
 
     private val searchColumns = listOf("All", "itemId", "barcode", "name", "description", "art", "material", "col", "category")
+
+    companion object {
+        private const val PREFS_ITEM = "prefs_item"
+        private const val KEY_VIEW_TYPE = "view_type"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +64,10 @@ class ItemActivity : BaseDrawerActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = ItemAdapter(emptyList())
+        val sharedPrefs = getSharedPreferences(PREFS_ITEM, Context.MODE_PRIVATE)
+        val savedViewType = sharedPrefs.getInt(KEY_VIEW_TYPE, ItemAdapter.VIEW_TYPE_FASHION)
+        
+        adapter = ItemAdapter(emptyList(), savedViewType)
         rvItems.layoutManager = LinearLayoutManager(this)
         rvItems.adapter = adapter
     }
@@ -72,6 +83,31 @@ class ItemActivity : BaseDrawerActivity() {
                 false
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_item, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_view_simple -> {
+                saveViewType(ItemAdapter.VIEW_TYPE_SIMPLE)
+                true
+            }
+            R.id.action_view_fashion -> {
+                saveViewType(ItemAdapter.VIEW_TYPE_FASHION)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun saveViewType(viewType: Int) {
+        val sharedPrefs = getSharedPreferences(PREFS_ITEM, Context.MODE_PRIVATE)
+        sharedPrefs.edit().putInt(KEY_VIEW_TYPE, viewType).apply()
+        adapter.setViewType(viewType)
     }
 
     private fun loadData() {

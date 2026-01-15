@@ -157,4 +157,16 @@ class ItemRepository(context: Context) : BaseDataRepository() {
             db.endTransaction()
         }
     }
+
+    fun deleteAll() {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(DbContract.BarcodeTable.TABLE_NAME, null, null)
+            db.delete(DbContract.ItemTable.TABLE_NAME, null, null)
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
 }

@@ -1,13 +1,17 @@
 package com.ferrine.stockopname.ui.main
 
 import android.content.Context
+import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import com.ferrine.stockopname.BaseDrawerActivity
@@ -30,6 +34,9 @@ class MainActivity : BaseDrawerActivity() {
     private lateinit var tvItemCount: TextView
     private lateinit var tvOpnameCount: TextView
     private lateinit var btnUploadCsv: Button
+    private lateinit var btnDownloadDb: Button
+    private lateinit var btnClearCollectedData: Button
+    private lateinit var btnClearItem: Button
 
     private val itemRepository by lazy { ItemRepository(this) }
     private val opnameRowRepository by lazy { OpnameRowRepository(this) }
@@ -41,6 +48,12 @@ class MainActivity : BaseDrawerActivity() {
     private val selectCsvLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             importCsv(it)
+        }
+    }
+
+    private val createDbLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/x-sqlite3")) { uri: Uri? ->
+        uri?.let {
+            exportDatabase(it)
         }
     }
 
@@ -61,12 +74,75 @@ class MainActivity : BaseDrawerActivity() {
         tvItemCount = findViewById(R.id.tvItemCount)
         tvOpnameCount = findViewById(R.id.tvOpnameCount)
         btnUploadCsv = findViewById(R.id.btnUploadCsv)
+        btnDownloadDb = findViewById(R.id.btnDownloadDb)
+        btnClearCollectedData = findViewById(R.id.btnClearCollectedData)
+        btnClearItem = findViewById(R.id.btnClearItem)
     }
 
     private fun setupListeners() {
         btnUploadCsv.setOnClickListener {
             selectCsvLauncher.launch("text/comma-separated-values")
         }
+        btnDownloadDb.setOnClickListener {
+            createDbLauncher.launch("stockopname.db")
+        }
+        btnClearCollectedData.setOnClickListener {
+            showClearCollectedDataDialog()
+        }
+        btnClearItem.setOnClickListener {
+            showClearItemDialog()
+        }
+    }
+
+    private fun showClearCollectedDataDialog() {
+        val input = EditText(this)
+        input.hint = "type 'clear data' here"
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        val container = LinearLayout(this)
+        container.orientation = LinearLayout.VERTICAL
+        lp.setMargins(48, 20, 48, 0)
+        input.layoutParams = lp
+        container.addView(input)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Clear Collected Data")
+            .setMessage("Data opname yang telah dikumpulkan akan dihapus permanen. Ketik \"clear data\" untuk melanjutkan.")
+            .setView(container)
+            .setNegativeButton("Batal", null)
+            .setPositiveButton("Lanjut Delete") { _, _ ->
+                val typedText = input.text.toString()
+                if (typedText == "clear data") {
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) { opnameRowRepository.deleteAll() }
+                        updateCounts()
+                        Toast.makeText(this@MainActivity, "Data opname berhasil dihapus", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this@MainActivity, "Konfirmasi salah, data tidak dihapus", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .create()
+
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(android.R.color.holo_red_dark))
+    }
+
+    private fun showClearItemDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Clear Item")
+            .setMessage("Tabel item dan barcode akan dikosongkan. Lanjutkan?")
+            .setNegativeButton("Batal", null)
+            .setPositiveButton("Delete") { _, _ ->
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) { itemRepository.deleteAll() }
+                    updateCounts()
+                    Toast.makeText(this@MainActivity, "Data item dan barcode berhasil dihapus", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .show()
     }
 
     override fun onResume() {
@@ -138,6 +214,7 @@ class MainActivity : BaseDrawerActivity() {
                 while (line != null) {
                     val tokens = line.split("|")
                     if (tokens.size >= 15) {
+                        // barcode|itemId|article|material|color|size|name|description|category|price|sellPrice|discount|isSpecialPrice|stockQty|printQty|pricingId
                         val item = Item(
                             itemId = tokens[0].trim(),
                             article = tokens[1].trim(),
@@ -162,6 +239,30 @@ class MainActivity : BaseDrawerActivity() {
             }
         }
         return items
+    }
+
+    private fun exportDatabase(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val dbFile = getDatabasePath("stockopname.db")
+                if (!dbFile.exists()) {
+                    Toast.makeText(this@MainActivity, "Database tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                withContext(Dispatchers.IO) {
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        dbFile.inputStream().use { inputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                    }
+                }
+                Toast.makeText(this@MainActivity, "Database berhasil diekspor", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@MainActivity, "Gagal mengekspor database: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun drawerIconColor(): Int {
