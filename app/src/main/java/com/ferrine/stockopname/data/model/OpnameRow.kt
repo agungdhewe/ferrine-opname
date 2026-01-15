@@ -11,6 +11,7 @@ data class OpnameRow(
     val deviceId: String = "",
     val userId: String = "",
     val barcode: String = "",
+    val boxcode: String = "",
     val itemId: String = "",
     val scannedQty: Int = 0,
     val article: String = "",
@@ -20,6 +21,7 @@ data class OpnameRow(
     val description: String = "",
     val category: String = "",
     val price: Double = 0.0,
+    val sellPrice: Double = 0.0,
     val discount: Double = 0.0,
     val isSpecialPrice: Boolean = false,
     val pricingId: String = ""

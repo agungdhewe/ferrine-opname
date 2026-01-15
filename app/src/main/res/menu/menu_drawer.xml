@@ -8,6 +8,11 @@
         android:icon="@drawable/ic_home"/>
 
     <item
+        android:id="@+id/menu_item"
+        android:title="Item"
+        android:icon="@drawable/ic_typing"/>
+
+    <item
         android:id="@+id/menu_opname"
         android:title="Opname"
         android:icon="@drawable/ic_opname"/>

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.ferrine.stockopname.data.model.WorkingTypes
+import com.ferrine.stockopname.ui.item.ItemActivity
 import com.ferrine.stockopname.ui.main.MainActivity
 import com.ferrine.stockopname.ui.opname.OpnameActivity
 import com.ferrine.stockopname.ui.printlabel.PrintlabelActivity
@@ -96,6 +97,9 @@ abstract class BaseDrawerActivity : BaseActivity(),
             menu.findItem(R.id.menu_print_label).isVisible = workingType == WorkingTypes.PRINTLABEL.name
         }
 
+		// Menu Item muncul untuk semua user
+		menu.findItem(R.id.menu_item).isVisible = true
+
 		// Menu User hanya muncul untuk Admin
 		menu.findItem(R.id.menu_user).isVisible = sessionManager.isAdmin
 		
@@ -112,6 +116,7 @@ abstract class BaseDrawerActivity : BaseActivity(),
 	override fun onNavigationItemSelected(item: android.view.MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.menu_home -> navigate(MainActivity::class.java)
+			R.id.menu_item -> navigate(ItemActivity::class.java)
 			R.id.menu_opname -> navigate(OpnameActivity::class.java)
 			R.id.menu_receiving -> navigate(ReceivingActivity::class.java)
 			R.id.menu_transfer -> navigate(TransferActivity::class.java)
@@ -134,7 +139,8 @@ abstract class BaseDrawerActivity : BaseActivity(),
 			// supaya bisa kembali ke activity sebelumnya saat tombol back ditekan.
 			if (this !is MainActivity && 
 				target != SettingActivity::class.java && 
-				target != UserActivity::class.java) {
+				target != UserActivity::class.java &&
+				target != ItemActivity::class.java) {
 				finish()
 			}
 		}
