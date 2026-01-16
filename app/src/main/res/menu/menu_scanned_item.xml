@@ -27,6 +27,9 @@
                     android:id="@+id/action_download_scanned_data"
                     android:title="@string/menu_item_download_scanned_data" />
                 <item
+                    android:id="@+id/action_download_summary"
+                    android:title="@string/menu_item_download_summary" />
+                <item
                     android:id="@+id/action_clear_collected_data"
                     android:title="@string/menu_item_clear_collected_data" />
             </group>

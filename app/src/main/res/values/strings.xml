@@ -12,5 +12,6 @@
     <string name="menu_item_download_template">\u00A0\u00A0\u00A0Download Template</string>
     <string name="menu_item_clear_data">\u00A0\u00A0\u00A0Clear Item Data</string>
     <string name="menu_item_download_scanned_data">\u00A0\u00A0\u00A0Download Scanned Data</string>
+    <string name="menu_item_download_summary">\u00A0\u00A0\u00A0Download Summary</string>
     <string name="menu_item_clear_collected_data">\u00A0\u00A0\u00A0Clear Collected Data</string>
 </resources>

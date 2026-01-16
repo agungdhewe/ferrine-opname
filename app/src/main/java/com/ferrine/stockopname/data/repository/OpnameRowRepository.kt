@@ -120,24 +120,26 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         val query = """
             SELECT 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY}, 
                 SUM(o.${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) as totalQty,
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
             FROM ${DbContract.OpnameTable.TABLE_NAME} o
             JOIN ${DbContract.ItemTable.TABLE_NAME} i ON o.${DbContract.OpnameTable.COLUMN_ITEM_ID} = i.${DbContract.ItemTable.COLUMN_ITEM_ID}
             WHERE o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?
             GROUP BY 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY},
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
         """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(workingType.name))
@@ -147,13 +149,69 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
                 summaryList.add(
                     SummaryItem(
                         itemId = cursor.getString(0),
-                        material = cursor.getString(1),
-                        color = cursor.getString(2),
-                        size = cursor.getString(3),
-                        name = cursor.getString(4),
-                        category = cursor.getString(5),
-                        totalQty = cursor.getInt(6),
-                        article = cursor.getString(7)
+                        article = cursor.getString(1),
+                        material = cursor.getString(2),
+                        color = cursor.getString(3),
+                        size = cursor.getString(4),
+                        name = cursor.getString(5),
+                        category = cursor.getString(6),
+                        totalQty = cursor.getInt(7),
+                        description = cursor.getString(8)
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return summaryList
+    }
+
+    fun getSummaryItemExtended(workingType: WorkingTypes): List<Map<String, Any>> {
+        val db = dbHelper.readableDatabase
+        val summaryList = mutableListOf<Map<String, Any>>()
+
+        val query = """
+            SELECT 
+                o.${DbContract.OpnameTable.COLUMN_PROJECT_ID}, 
+                o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE},
+                o.${DbContract.OpnameTable.COLUMN_DEVICE_ID}, 
+                o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_NAME}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
+                i.${DbContract.ItemTable.COLUMN_MAT}, 
+                i.${DbContract.ItemTable.COLUMN_SIZE}, 
+                i.${DbContract.ItemTable.COLUMN_DESC}, 
+                SUM(o.${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) as totalQty
+            FROM ${DbContract.OpnameTable.TABLE_NAME} o
+            JOIN ${DbContract.ItemTable.TABLE_NAME} i ON o.${DbContract.OpnameTable.COLUMN_ITEM_ID} = i.${DbContract.ItemTable.COLUMN_ITEM_ID}
+            WHERE o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?
+            GROUP BY 
+                o.${DbContract.OpnameTable.COLUMN_PROJECT_ID}, 
+                o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE},
+                o.${DbContract.OpnameTable.COLUMN_DEVICE_ID}, 
+                o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_NAME}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
+                i.${DbContract.ItemTable.COLUMN_MAT}, 
+                i.${DbContract.ItemTable.COLUMN_SIZE}, 
+                i.${DbContract.ItemTable.COLUMN_DESC}
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(workingType.name))
+
+        if (cursor.moveToFirst()) {
+            do {
+                summaryList.add(
+                    mapOf(
+                        "projectId" to cursor.getString(0),
+                        "workingType" to cursor.getString(1),
+                        "deviceId" to cursor.getString(2),
+                        "itemId" to cursor.getString(3),
+                        "name" to cursor.getString(4),
+                        "article" to cursor.getString(5),
+                        "material" to cursor.getString(6),
+                        "size" to cursor.getString(7),
+                        "description" to cursor.getString(8),
+                        "totalQty" to cursor.getInt(9)
                     )
                 )
             } while (cursor.moveToNext())
@@ -170,13 +228,14 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         val query = """
             SELECT 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY}, 
                 SUM(o.${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) as totalQty,
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
             FROM ${DbContract.OpnameTable.TABLE_NAME} o
             JOIN ${DbContract.ItemTable.TABLE_NAME} i ON o.${DbContract.OpnameTable.COLUMN_ITEM_ID} = i.${DbContract.ItemTable.COLUMN_ITEM_ID}
             WHERE o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?
@@ -190,12 +249,13 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
             )
             GROUP BY 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY},
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
         """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(workingType.name, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern))
@@ -205,13 +265,14 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
                 summaryList.add(
                     SummaryItem(
                         itemId = cursor.getString(0),
-                        material = cursor.getString(1),
-                        color = cursor.getString(2),
-                        size = cursor.getString(3),
-                        name = cursor.getString(4),
-                        category = cursor.getString(5),
-                        totalQty = cursor.getInt(6),
-                        article = cursor.getString(7)
+                        article = cursor.getString(1),
+                        material = cursor.getString(2),
+                        color = cursor.getString(3),
+                        size = cursor.getString(4),
+                        name = cursor.getString(5),
+                        category = cursor.getString(6),
+                        totalQty = cursor.getInt(7),
+                        description = cursor.getString(8)
                     )
                 )
             } while (cursor.moveToNext())
@@ -228,25 +289,27 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         val query = """
             SELECT 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY}, 
                 SUM(o.${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) as totalQty,
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
             FROM ${DbContract.OpnameTable.TABLE_NAME} o
             JOIN ${DbContract.ItemTable.TABLE_NAME} i ON o.${DbContract.OpnameTable.COLUMN_ITEM_ID} = i.${DbContract.ItemTable.COLUMN_ITEM_ID}
             WHERE o.${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?
             AND o.${DbContract.OpnameTable.COLUMN_BARCODE} LIKE ?
             GROUP BY 
                 o.${DbContract.OpnameTable.COLUMN_ITEM_ID}, 
+                i.${DbContract.ItemTable.COLUMN_ART}, 
                 i.${DbContract.ItemTable.COLUMN_MAT}, 
                 i.${DbContract.ItemTable.COLUMN_COL}, 
                 i.${DbContract.ItemTable.COLUMN_SIZE}, 
                 i.${DbContract.ItemTable.COLUMN_NAME}, 
                 i.${DbContract.ItemTable.COLUMN_CATEGORY},
-                i.${DbContract.ItemTable.COLUMN_ART}
+                i.${DbContract.ItemTable.COLUMN_DESC}
         """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(workingType.name, searchPattern))
@@ -256,13 +319,14 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
                 summaryList.add(
                     SummaryItem(
                         itemId = cursor.getString(0),
-                        material = cursor.getString(1),
-                        color = cursor.getString(2),
-                        size = cursor.getString(3),
-                        name = cursor.getString(4),
-                        category = cursor.getString(5),
-                        totalQty = cursor.getInt(6),
-                        article = cursor.getString(7)
+                        article = cursor.getString(1),
+                        material = cursor.getString(2),
+                        color = cursor.getString(3),
+                        size = cursor.getString(4),
+                        name = cursor.getString(5),
+                        category = cursor.getString(6),
+                        totalQty = cursor.getInt(7),
+                        description = cursor.getString(8)
                     )
                 )
             } while (cursor.moveToNext())

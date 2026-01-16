@@ -1,7 +1,6 @@
 package com.ferrine.stockopname.ui.scanneditem
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -19,7 +18,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,8 +33,6 @@ import com.ferrine.stockopname.ui.setting.SettingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 
 class ScannedItemActivity : BaseDrawerActivity() {
 
@@ -56,6 +52,12 @@ class ScannedItemActivity : BaseDrawerActivity() {
     private val exportCsvLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri: Uri? ->
         uri?.let {
             exportScannedDataCsv(it)
+        }
+    }
+
+    private val exportSummaryLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri: Uri? ->
+        uri?.let {
+            exportSummaryCsv(it)
         }
     }
 
@@ -145,6 +147,12 @@ class ScannedItemActivity : BaseDrawerActivity() {
                 val workingType = getWorkingType()
                 val fileName = "scanned_data_${workingType.name.lowercase()}.csv"
                 exportCsvLauncher.launch(fileName)
+                true
+            }
+            R.id.action_download_summary -> {
+                val workingType = getWorkingType()
+                val fileName = "summary_${workingType.name.lowercase()}.csv"
+                exportSummaryLauncher.launch(fileName)
                 true
             }
             R.id.action_clear_collected_data -> {
@@ -247,22 +255,62 @@ class ScannedItemActivity : BaseDrawerActivity() {
                     return@launch
                 }
 
+                val siteCode = prefs.getString(SettingActivity.KEY_SITE_CODE, "") ?: ""
+                val brandCode = prefs.getString(SettingActivity.KEY_BRAND_CODE, "") ?: ""
+
                 val delimiterName = prefs.getString(SettingActivity.KEY_CSV_DELIMITER, CsvDelimiter.COMMA.name)
                 val selectedDelimiter = CsvDelimiter.entries.find { it.name == delimiterName } ?: CsvDelimiter.COMMA
                 val d = selectedDelimiter.character
 
-                val header = "timestamp${d}activity${d}projectId${d}deviceId${d}userId${d}barcode${d}boxcode${d}itemId${d}scannedQty\n"
+                val header = "siteCode${d}brandCode${d}timestamp${d}activity${d}projectId${d}deviceId${d}userId${d}barcode${d}boxcode${d}itemId${d}scannedQty\n"
                 
                 withContext(Dispatchers.IO) {
                     contentResolver.openOutputStream(uri)?.use { outputStream ->
                         outputStream.write(header.toByteArray())
                         rows.forEach { row ->
-                            val line = "${row.timestamp}${d}${row.activity}${d}${row.projectId}${d}${row.deviceId}${d}${row.userId}${d}${row.barcode}${d}${row.boxcode}${d}${row.itemId}${d}${row.scannedQty}\n"
+                            val line = "$siteCode${d}$brandCode${d}${row.timestamp}${d}${row.activity}${d}${row.projectId}${d}${row.deviceId}${d}${row.userId}${d}${row.barcode}${d}${row.boxcode}${d}${row.itemId}${d}${row.scannedQty}\n"
                             outputStream.write(line.toByteArray())
                         }
                     }
                 }
                 Toast.makeText(this@ScannedItemActivity, "Data exported successfully", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@ScannedItemActivity, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun exportSummaryCsv(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val workingType = getWorkingType()
+                val summary = withContext(Dispatchers.IO) { opnameRowRepository.getSummaryItemExtended(workingType) }
+                
+                if (summary.isEmpty()) {
+                    Toast.makeText(this@ScannedItemActivity, "No data to export", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                val siteCode = prefs.getString(SettingActivity.KEY_SITE_CODE, "") ?: ""
+                val brandCode = prefs.getString(SettingActivity.KEY_BRAND_CODE, "") ?: ""
+
+                val delimiterName = prefs.getString(SettingActivity.KEY_CSV_DELIMITER, CsvDelimiter.COMMA.name)
+                val selectedDelimiter = CsvDelimiter.entries.find { it.name == delimiterName } ?: CsvDelimiter.COMMA
+                val d = selectedDelimiter.character
+
+                val header = "siteCode${d}brandCode${d}projectId${d}workingType${d}deviceId${d}itemId${d}name${d}article${d}material${d}size${d}description${d}totalQty\n"
+                
+                withContext(Dispatchers.IO) {
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(header.toByteArray())
+                        summary.forEach { row ->
+                            val line = "$siteCode${d}$brandCode${d}${row["projectId"]}${d}${row["workingType"]}${d}${row["deviceId"]}${d}${row["itemId"]}${d}${row["name"]}${d}${row["article"]}${d}${row["material"]}${d}${row["size"]}${d}${row["description"]}${d}${row["totalQty"]}\n"
+                            outputStream.write(line.toByteArray())
+                        }
+                    }
+                }
+                Toast.makeText(this@ScannedItemActivity, "Summary exported successfully", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(this@ScannedItemActivity, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()

@@ -12,5 +12,6 @@ data class SummaryItem(
     val size: String,
     val name: String,
     val category: String,
-    val totalQty: Int
+    val totalQty: Int,
+    val description: String = ""
 ) : Parcelable
