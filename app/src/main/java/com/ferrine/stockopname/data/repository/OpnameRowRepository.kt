@@ -81,6 +81,38 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         return totalQty
     }
 
+    fun getAllRows(workingType: WorkingTypes): List<OpnameRow> {
+        val db = dbHelper.readableDatabase
+        val rows = mutableListOf<OpnameRow>()
+        val cursor = db.query(
+            DbContract.OpnameTable.TABLE_NAME,
+            null,
+            "${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?",
+            arrayOf(workingType.name),
+            null, null, null
+        )
+
+        if (cursor.moveToFirst()) {
+            do {
+                rows.add(
+                    OpnameRow(
+                        timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_TIMESTAMP)),
+                        activity = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_WORKING_TYPE)),
+                        projectId = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_PROJECT_ID)),
+                        deviceId = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_DEVICE_ID)),
+                        userId = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_USER_ID)),
+                        barcode = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_BARCODE)),
+                        boxcode = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_BOXCODE)),
+                        itemId = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_ITEM_ID)),
+                        scannedQty = cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.OpnameTable.COLUMN_SCANNED_QTY))
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return rows
+    }
+
     fun getSummaryItem(workingType: WorkingTypes): List<SummaryItem> {
         val db = dbHelper.readableDatabase
         val summaryList = mutableListOf<SummaryItem>()
@@ -242,5 +274,14 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
     fun deleteAll() {
         val db = dbHelper.writableDatabase
         db.delete(DbContract.OpnameTable.TABLE_NAME, null, null)
+    }
+
+    fun deleteByWorkingType(workingType: WorkingTypes) {
+        val db = dbHelper.writableDatabase
+        db.delete(
+            DbContract.OpnameTable.TABLE_NAME,
+            "${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?",
+            arrayOf(workingType.name)
+        )
     }
 }
