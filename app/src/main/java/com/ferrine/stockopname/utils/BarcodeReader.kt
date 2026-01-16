@@ -65,7 +65,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
 				val row = OpnameRow(
 					timestamp = timestamp,
 					activity = workingType.name,
-					opnameId = "", // Bisa diisi jika ada ID transaksi/opname yang aktif
+					projectId = "", // Bisa diisi jika ada ID proyek/opname yang aktif
 					deviceId = deviceId,
 					userId = sessionManager.username ?: "",
 					barcode = barcode,
@@ -93,7 +93,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
                 // Ambil total akumulasi qty yang sudah discan untuk item ini
                 val totalScanned = withContext(Dispatchers.IO) {
                     try {
-                        // Menggunakan opnameId dan itemId dari objek row yang baru dibuat
+                        // Menggunakan projectId dan itemId dari objek row yang baru dibuat
                         opnameRowRepository.getScannedQty(workingType, row.itemId)
                     } catch (e: Exception) {
                         Log.e("BarcodeReader", "Error getScannedQty: ${e.message}")

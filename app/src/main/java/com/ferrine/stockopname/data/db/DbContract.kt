@@ -44,7 +44,7 @@ object DbContract {
 		const val TABLE_NAME = "opname"
 		const val COLUMN_TIMESTAMP = "timestamp" // integer timestamp up milisecond for identity
 		const val COLUMN_WORKING_TYPE = "working_type" // string
-		const val COLUMN_OPNAME_ID = "opname_id" // string
+		const val COLUMN_PROJECT_ID = "project_id" // string
 		const val COLUMN_DEVICE_ID = "device_id" // string
 		const val COLUMN_USER_ID = "user_id" // string
 		const val COLUMN_BARCODE = "barcode" // string

@@ -17,7 +17,7 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         val values = ContentValues().apply {
             put(DbContract.OpnameTable.COLUMN_TIMESTAMP, if (row.timestamp == 0L) System.currentTimeMillis() else row.timestamp)
             put(DbContract.OpnameTable.COLUMN_WORKING_TYPE, row.activity)
-            put(DbContract.OpnameTable.COLUMN_OPNAME_ID, row.opnameId)
+            put(DbContract.OpnameTable.COLUMN_PROJECT_ID, row.projectId)
             put(DbContract.OpnameTable.COLUMN_DEVICE_ID, row.deviceId)
             put(DbContract.OpnameTable.COLUMN_USER_ID, row.userId)
             put(DbContract.OpnameTable.COLUMN_BARCODE, row.barcode)

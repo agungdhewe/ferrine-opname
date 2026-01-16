@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class OpnameRow(
     val timestamp: Long = 0L,
     val activity: String = "",
-    val opnameId: String = "",
+    val projectId: String = "",
     val deviceId: String = "",
     val userId: String = "",
     val barcode: String = "",

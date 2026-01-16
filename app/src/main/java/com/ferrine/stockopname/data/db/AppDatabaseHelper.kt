@@ -122,7 +122,7 @@ class AppDatabaseHelper(context: Context) :
             CREATE TABLE ${DbContract.OpnameTable.TABLE_NAME} (
                 ${DbContract.OpnameTable.COLUMN_TIMESTAMP} INTEGER PRIMARY KEY,
                 ${DbContract.OpnameTable.COLUMN_WORKING_TYPE} TEXT,
-                ${DbContract.OpnameTable.COLUMN_OPNAME_ID} TEXT,
+                ${DbContract.OpnameTable.COLUMN_PROJECT_ID} TEXT,
                 ${DbContract.OpnameTable.COLUMN_DEVICE_ID} TEXT,
                 ${DbContract.OpnameTable.COLUMN_USER_ID} TEXT,
                 ${DbContract.OpnameTable.COLUMN_BARCODE} TEXT,
