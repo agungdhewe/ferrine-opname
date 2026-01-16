@@ -30,6 +30,7 @@ class MainActivity : BaseDrawerActivity() {
     private lateinit var tvSiteCode: TextView
     private lateinit var tvBrandCode: TextView
     private lateinit var tvItemCount: TextView
+    private lateinit var tvOpnameLabel: TextView
     private lateinit var tvOpnameCount: TextView
     private lateinit var btnStart: Button
     private lateinit var btnDownloadDb: Button
@@ -62,6 +63,7 @@ class MainActivity : BaseDrawerActivity() {
         tvSiteCode = findViewById(R.id.tvSiteCode)
         tvBrandCode = findViewById(R.id.tvBrandCode)
         tvItemCount = findViewById(R.id.tvItemCount)
+        tvOpnameLabel = findViewById(R.id.tvOpnameLabel)
         tvOpnameCount = findViewById(R.id.tvOpnameCount)
         btnStart = findViewById(R.id.btnStart)
         btnDownloadDb = findViewById(R.id.btnDownloadDb)
@@ -135,12 +137,14 @@ class MainActivity : BaseDrawerActivity() {
             WorkingTypes.NONE
         }
 
+        tvOpnameLabel.text = if (workingType == WorkingTypes.PRINTLABEL) "Total Printed" else "Total Qty"
+
         lifecycleScope.launch {
             val itemCount = withContext(Dispatchers.IO) { itemRepository.getCount() }
-            val opnameCount = withContext(Dispatchers.IO) { opnameRowRepository.getCount(workingType) }
+            val totalScanned = withContext(Dispatchers.IO) { opnameRowRepository.getTotalScannedQty(workingType) }
             
             tvItemCount.text = itemCount.toString()
-            tvOpnameCount.text = opnameCount.toString()
+            tvOpnameCount.text = totalScanned.toString()
         }
     }
 

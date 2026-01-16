@@ -65,6 +65,20 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         return count
     }
 
+    fun getTotalScannedQty(workingType: WorkingTypes): Int {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT SUM(${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) FROM ${DbContract.OpnameTable.TABLE_NAME} WHERE ${DbContract.OpnameTable.COLUMN_WORKING_TYPE} = ?",
+            arrayOf(workingType.name)
+        )
+        var total = 0
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0)
+        }
+        cursor.close()
+        return total
+    }
+
     fun getScannedQty(workingType: WorkingTypes, itemId: String): Double {
         val db = dbHelper.readableDatabase
         val query = "SELECT SUM(${DbContract.OpnameTable.COLUMN_SCANNED_QTY}) FROM ${DbContract.OpnameTable.TABLE_NAME} " +

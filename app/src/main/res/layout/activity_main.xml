@@ -186,9 +186,10 @@
                                 android:gravity="center">
 
                                 <TextView
+                                    android:id="@+id/tvOpnameLabel"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Opname Rows"
+                                    android:text="Total Qty"
                                     android:textSize="12sp" />
 
                                 <TextView
