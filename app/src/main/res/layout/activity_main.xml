@@ -218,18 +218,10 @@
                     app:cornerRadius="8dp" />
 
                 <Button
-                    android:id="@+id/btnUploadCsv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Upload Item CSV"
-                    android:visibility="gone" />
-
-                <Button
                     android:id="@+id/btnDownloadDb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="24dp"
                     android:text="Download DB"
                     app:icon="@android:drawable/stat_sys_download"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -243,15 +235,6 @@
                     android:textColor="@android:color/white"
                     app:backgroundTint="@color/design_default_color_error"
                     style="@style/Widget.MaterialComponents.Button"/>
-
-                <Button
-                    android:id="@+id/btnClearItem"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Clear Item"
-                    android:textColor="@color/design_default_color_error"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             </LinearLayout>
         </ScrollView>

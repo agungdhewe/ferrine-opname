@@ -2,18 +2,37 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_view_type"
-        android:title="View Type"
+        android:id="@+id/action_item_options"
+        android:title="Options"
         android:icon="@android:drawable/ic_menu_more"
         app:iconTint="@android:color/white"
         app:showAsAction="always">
         <menu>
-            <item
-                android:id="@+id/action_view_simple"
-                android:title="Simple" />
-            <item
-                android:id="@+id/action_view_fashion"
-                android:title="Fashion" />
+            <group android:id="@+id/group_view_type">
+                <item
+                    android:title="@string/menu_title_view_type"
+                    android:enabled="false" />
+                <item
+                    android:id="@+id/action_view_simple"
+                    android:title="@string/menu_item_simple" />
+                <item
+                    android:id="@+id/action_view_fashion"
+                    android:title="@string/menu_item_fashion" />
+            </group>
+            <group android:id="@+id/group_data">
+                <item
+                    android:title="@string/menu_title_action"
+                    android:enabled="false" />
+                <item
+                    android:id="@+id/action_upload_csv"
+                    android:title="@string/menu_item_upload_csv" />
+                <item
+                    android:id="@+id/action_download_template"
+                    android:title="@string/menu_item_download_template" />
+                <item
+                    android:id="@+id/action_clear_data"
+                    android:title="@string/menu_item_clear_data" />
+            </group>
         </menu>
     </item>
 </menu>

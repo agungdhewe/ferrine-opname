@@ -3,4 +3,12 @@
     <string name="btn_scan_idle">SCAN</string>
     <string name="btn_scan_active">SCANNING BARCODE...</string>
     <string name="msg_wait">Wait...</string>
+
+    <string name="menu_title_view_type"><b>View Type</b></string>
+    <string name="menu_title_action"><b>Action</b></string>
+    <string name="menu_item_simple">\u00A0\u00A0\u00A0Simple</string>
+    <string name="menu_item_fashion">\u00A0\u00A0\u00A0Fashion</string>
+    <string name="menu_item_upload_csv">\u00A0\u00A0\u00A0Upload Item CSV</string>
+    <string name="menu_item_download_template">\u00A0\u00A0\u00A0Download Template</string>
+    <string name="menu_item_clear_data">\u00A0\u00A0\u00A0Clear Item Data</string>
 </resources>
