@@ -10,7 +10,8 @@ import com.ferrine.stockopname.utils.SessionManager
 
 abstract class BaseActivity : AppCompatActivity() {
 
-	protected lateinit var sessionManager: SessionManager
+	lateinit var sessionManager: SessionManager
+		private set
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		// harus menggunakan Light Theme

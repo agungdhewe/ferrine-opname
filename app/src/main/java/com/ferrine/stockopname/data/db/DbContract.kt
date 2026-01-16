@@ -43,7 +43,7 @@ object DbContract {
 	object OpnameTable {
 		const val TABLE_NAME = "opname"
 		const val COLUMN_TIMESTAMP = "timestamp" // integer timestamp up milisecond for identity
-		const val COLUMN_ACTIVITY = "activity" // string
+		const val COLUMN_WORKING_TYPE = "working_type" // string
 		const val COLUMN_OPNAME_ID = "opname_id" // string
 		const val COLUMN_DEVICE_ID = "device_id" // string
 		const val COLUMN_USER_ID = "user_id" // string
@@ -51,18 +51,6 @@ object DbContract {
 		const val COLUMN_BOXCODE = "boxcode" // string
 		const val COLUMN_ITEM_ID = "item_id" // string
 		const val COLUMN_SCANNED_QTY = "qty"  // integer
-		const val COLUMN_ART = "article" // string
-		const val COLUMN_MAT = "meterial" // string
-		const val COLUMN_COL = "color" // string
-		const val COLUMN_SIZE = "size" // string
-		const val COLUMN_NAME = "nama" // string
-		const val COLUMN_DESC = "deskripsi" // string
-		const val COLUMN_CATEGORY = "category" // string
-		const val COLUMN_PRICE = "harga" // decimal
-		const val COLUMN_SELL_PRICE = "harga_jual" // decimal
-		const val COLUMN_DISC = "discount" // percent
-		const val COLUMN_ISSP = "is_specialprice" // boolean
-		const val COLUMN_PRICING_ID = "pricing_id" // string
 	}
 
 

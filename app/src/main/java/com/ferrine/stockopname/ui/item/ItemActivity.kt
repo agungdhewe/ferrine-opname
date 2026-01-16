@@ -1,6 +1,5 @@
 package com.ferrine.stockopname.ui.item
 
-import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ferrine.stockopname.BaseDrawerActivity
 import com.ferrine.stockopname.R
 import com.ferrine.stockopname.data.repository.ItemRepository
+import androidx.core.content.edit
 
 class ItemActivity : BaseDrawerActivity() {
 
@@ -31,8 +31,8 @@ class ItemActivity : BaseDrawerActivity() {
     private val searchColumns = listOf("All", "itemId", "barcode", "name", "description", "art", "material", "col", "category")
 
     companion object {
-        private const val PREFS_ITEM = "prefs_item"
-        private const val KEY_VIEW_TYPE = "view_type"
+        const val PREFS_ITEM = "prefs_item"
+        const val KEY_VIEW_TYPE = "view_type"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ class ItemActivity : BaseDrawerActivity() {
     }
 
     private fun setupRecyclerView() {
-        val sharedPrefs = getSharedPreferences(PREFS_ITEM, Context.MODE_PRIVATE)
+        val sharedPrefs = getSharedPreferences(PREFS_ITEM, MODE_PRIVATE)
         val savedViewType = sharedPrefs.getInt(KEY_VIEW_TYPE, ItemAdapter.VIEW_TYPE_FASHION)
         
         adapter = ItemAdapter(emptyList(), savedViewType)
@@ -105,8 +105,8 @@ class ItemActivity : BaseDrawerActivity() {
     }
 
     private fun saveViewType(viewType: Int) {
-        val sharedPrefs = getSharedPreferences(PREFS_ITEM, Context.MODE_PRIVATE)
-        sharedPrefs.edit().putInt(KEY_VIEW_TYPE, viewType).apply()
+        val sharedPrefs = getSharedPreferences(PREFS_ITEM, MODE_PRIVATE)
+        sharedPrefs.edit { putInt(KEY_VIEW_TYPE, viewType) }
         adapter.setViewType(viewType)
     }
 

@@ -3,7 +3,7 @@
     android:shape="rectangle">
 
     <!-- Warna latar belakang (Abu-abu sangat muda) -->
-    <solid android:color="#FFFFFF" />
+    <solid android:color="#E4E4E4" />
 
     <!-- Warna garis tepi (Stroke) - opsional agar lebih tegas -->
     <stroke

@@ -7,10 +7,10 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.ferrine.stockopname.data.repository.UserRepository
 
 class AppDatabaseHelper(context: Context) :
-	SQLiteOpenHelper(context, "stockopname.db", null, 2) { // Naikkan versi ke 2
+	SQLiteOpenHelper(context, "stockopname.db", null, 1) {
 
 	override fun onCreate(db: SQLiteDatabase) {
-		createUserTable(db)
+        createUserTable(db)
 		createItemTable(db)
 		createBarcodeTable(db)
 		createOpnameTable(db)
@@ -18,17 +18,19 @@ class AppDatabaseHelper(context: Context) :
 	}
 
 	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-		if (oldVersion < 2) {
-			// Sederhananya untuk dev: drop dan create ulang
-			db.execSQL("DROP TABLE IF EXISTS ${DbContract.ItemTable.TABLE_NAME}")
-			db.execSQL("DROP TABLE IF EXISTS ${DbContract.BarcodeTable.TABLE_NAME}")
-			createItemTable(db)
-			createBarcodeTable(db)
-		}
+		// Handle upgrades here if needed
+   }
+
+	override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+		// If downgraded, reset the database to ensure compatibility
+		// resetDatabaseInternal(db)
 	}
 
 	fun resetDatabase() {
-		val db = writableDatabase
+		resetDatabaseInternal(writableDatabase)
+	}
+
+	private fun resetDatabaseInternal(db: SQLiteDatabase) {
 		db.execSQL("DROP TABLE IF EXISTS ${DbContract.UserTable.TABLE_NAME}")
 		db.execSQL("DROP TABLE IF EXISTS ${DbContract.ItemTable.TABLE_NAME}")
 		db.execSQL("DROP TABLE IF EXISTS ${DbContract.BarcodeTable.TABLE_NAME}")
@@ -86,7 +88,7 @@ class AppDatabaseHelper(context: Context) :
 	private fun createItemTable(db: SQLiteDatabase) {
 		db.execSQL("""
 			CREATE TABLE ${DbContract.ItemTable.TABLE_NAME} (
-				${DbContract.ItemTable.COLUMN_ITEM_ID} TEXT PRIMARY KEY, -- Ubah ke TEXT
+				${DbContract.ItemTable.COLUMN_ITEM_ID} TEXT PRIMARY KEY,
 				${DbContract.ItemTable.COLUMN_ART} TEXT,
 				${DbContract.ItemTable.COLUMN_MAT} TEXT,
 				${DbContract.ItemTable.COLUMN_COL} TEXT,
@@ -117,29 +119,22 @@ class AppDatabaseHelper(context: Context) :
 
 	private fun createOpnameTable(db: SQLiteDatabase) {
 		db.execSQL("""
-		CREATE TABLE ${DbContract.OpnameTable.TABLE_NAME} (
-			${DbContract.OpnameTable.COLUMN_TIMESTAMP} INTEGER PRIMARY KEY,
-			${DbContract.OpnameTable.COLUMN_ACTIVITY} TEXT,
-			${DbContract.OpnameTable.COLUMN_OPNAME_ID} TEXT,
-			${DbContract.OpnameTable.COLUMN_DEVICE_ID} TEXT,
-			${DbContract.OpnameTable.COLUMN_USER_ID} TEXT,
-			${DbContract.OpnameTable.COLUMN_BARCODE} TEXT,
-			${DbContract.OpnameTable.COLUMN_BOXCODE} TEXT,
-			${DbContract.OpnameTable.COLUMN_ITEM_ID} TEXT,
-			${DbContract.OpnameTable.COLUMN_SCANNED_QTY} INTEGER,
-			${DbContract.OpnameTable.COLUMN_ART} TEXT,
-			${DbContract.OpnameTable.COLUMN_MAT} TEXT,
-			${DbContract.OpnameTable.COLUMN_COL} TEXT,
-			${DbContract.OpnameTable.COLUMN_SIZE} TEXT,
-			${DbContract.OpnameTable.COLUMN_NAME} TEXT,
-			${DbContract.OpnameTable.COLUMN_DESC} TEXT,
-			${DbContract.OpnameTable.COLUMN_CATEGORY} TEXT,
-			${DbContract.OpnameTable.COLUMN_PRICE} REAL,
-			${DbContract.OpnameTable.COLUMN_SELL_PRICE} REAL,
-			${DbContract.OpnameTable.COLUMN_DISC} REAL,
-			${DbContract.OpnameTable.COLUMN_ISSP} INTEGER,
-			${DbContract.OpnameTable.COLUMN_PRICING_ID} TEXT
-		)
-	""")
+            CREATE TABLE ${DbContract.OpnameTable.TABLE_NAME} (
+                ${DbContract.OpnameTable.COLUMN_TIMESTAMP} INTEGER PRIMARY KEY,
+                ${DbContract.OpnameTable.COLUMN_WORKING_TYPE} TEXT,
+                ${DbContract.OpnameTable.COLUMN_OPNAME_ID} TEXT,
+                ${DbContract.OpnameTable.COLUMN_DEVICE_ID} TEXT,
+                ${DbContract.OpnameTable.COLUMN_USER_ID} TEXT,
+                ${DbContract.OpnameTable.COLUMN_BARCODE} TEXT,
+                ${DbContract.OpnameTable.COLUMN_BOXCODE} TEXT,
+                ${DbContract.OpnameTable.COLUMN_ITEM_ID} TEXT,
+                ${DbContract.OpnameTable.COLUMN_SCANNED_QTY} INTEGER
+            )
+        """)
+
+        db.execSQL("""
+			CREATE INDEX idx_opname_activity_item 
+			ON ${DbContract.OpnameTable.TABLE_NAME} (${DbContract.OpnameTable.COLUMN_WORKING_TYPE}, ${DbContract.OpnameTable.COLUMN_ITEM_ID})
+		""")
 	}
 }

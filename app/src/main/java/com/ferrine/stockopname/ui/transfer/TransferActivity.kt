@@ -3,11 +3,11 @@ package com.ferrine.stockopname.ui.transfer
 import android.os.Bundle
 import com.ferrine.stockopname.BaseScannerActivity
 import com.ferrine.stockopname.R
-import com.ferrine.stockopname.data.model.PrintLabelMode
+import com.ferrine.stockopname.data.model.WorkingTypes
 
 class TransferActivity : BaseScannerActivity() {
 
-    override var currentMode: PrintLabelMode = PrintLabelMode.TRANSFER
+    override var currentWorkingType: WorkingTypes = WorkingTypes.TRANSFER
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

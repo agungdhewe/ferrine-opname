@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentContainerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.ferrine.stockopname.data.model.BarcodeScannerOptions
-import com.ferrine.stockopname.data.model.PrintLabelMode
+import com.ferrine.stockopname.data.model.WorkingTypes
 import com.ferrine.stockopname.ui.ScannerCameraFragment
 import com.ferrine.stockopname.ui.setting.SettingActivity
 import com.ferrine.stockopname.utils.BarcodeReader
@@ -30,7 +30,7 @@ abstract class BaseScannerActivity : BaseDrawerActivity() {
         protected set
 
     protected lateinit var barcodeReader: BarcodeReader
-    abstract var currentMode: PrintLabelMode
+    abstract var currentWorkingType: WorkingTypes
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +79,6 @@ abstract class BaseScannerActivity : BaseDrawerActivity() {
         builder.setPositiveButton("OK") { dialog, _ ->
             val newCode = input.text.toString()
             tvBoxCode.text = newCode
-            if (newCode.isNotEmpty()) {
-                findBarcode(newCode)
-            }
             dialog.dismiss()
         }
         builder.setNegativeButton("Batal") { dialog, _ ->
@@ -116,6 +113,6 @@ abstract class BaseScannerActivity : BaseDrawerActivity() {
     }
 
     fun findBarcode(barcode: String) {
-        barcodeReader.findBarcode(barcode, currentMode)
+        barcodeReader.findBarcode(barcode, currentWorkingType)
     }
 }

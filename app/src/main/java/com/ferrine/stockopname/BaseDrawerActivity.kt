@@ -15,6 +15,7 @@ import com.ferrine.stockopname.ui.main.MainActivity
 import com.ferrine.stockopname.ui.opname.OpnameActivity
 import com.ferrine.stockopname.ui.printlabel.PrintlabelActivity
 import com.ferrine.stockopname.ui.receiving.ReceivingActivity
+import com.ferrine.stockopname.ui.scanneditem.ScannedItemActivity
 import com.ferrine.stockopname.ui.setting.SettingActivity
 import com.ferrine.stockopname.ui.transfer.TransferActivity
 import com.ferrine.stockopname.ui.user.UserActivity
@@ -99,6 +100,9 @@ abstract class BaseDrawerActivity : BaseActivity(),
 
 		// Menu Item muncul untuk semua user
 		menu.findItem(R.id.menu_item).isVisible = true
+		
+		// Menu Scanned Items muncul untuk semua user
+		menu.findItem(R.id.menu_scanned_item).isVisible = true
 
 		// Menu User hanya muncul untuk Admin
 		menu.findItem(R.id.menu_user).isVisible = sessionManager.isAdmin
@@ -121,6 +125,7 @@ abstract class BaseDrawerActivity : BaseActivity(),
 			R.id.menu_receiving -> navigate(ReceivingActivity::class.java)
 			R.id.menu_transfer -> navigate(TransferActivity::class.java)
 			R.id.menu_print_label -> navigate(PrintlabelActivity::class.java)
+			R.id.menu_scanned_item -> navigate(ScannedItemActivity::class.java)
 			R.id.menu_user -> navigate(UserActivity::class.java)
 			R.id.menu_setting -> navigate(SettingActivity::class.java)
 			R.id.menu_logout -> showLogoutDialog()
@@ -140,7 +145,8 @@ abstract class BaseDrawerActivity : BaseActivity(),
 			if (this !is MainActivity && 
 				target != SettingActivity::class.java && 
 				target != UserActivity::class.java &&
-				target != ItemActivity::class.java) {
+				target != ItemActivity::class.java &&
+				target != ScannedItemActivity::class.java) {
 				finish()
 			}
 		}

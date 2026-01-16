@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.StockOpname" parent="Base.Theme.StockOpname" />
+
+    <style name="Theme.StockOpname.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.StockOpname.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

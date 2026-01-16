@@ -1,6 +1,7 @@
 package com.ferrine.stockopname.ui.main
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -16,11 +17,16 @@ import androidx.lifecycle.lifecycleScope
 import com.ferrine.stockopname.BaseDrawerActivity
 import com.ferrine.stockopname.R
 import com.ferrine.stockopname.data.model.Barcode
+import com.ferrine.stockopname.data.model.CsvDelimiter
 import com.ferrine.stockopname.data.model.Item
 import com.ferrine.stockopname.data.model.WorkingTypes
 import com.ferrine.stockopname.data.repository.ItemRepository
 import com.ferrine.stockopname.data.repository.OpnameRowRepository
+import com.ferrine.stockopname.ui.opname.OpnameActivity
+import com.ferrine.stockopname.ui.printlabel.PrintlabelActivity
+import com.ferrine.stockopname.ui.receiving.ReceivingActivity
 import com.ferrine.stockopname.ui.setting.SettingActivity
+import com.ferrine.stockopname.ui.transfer.TransferActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +36,7 @@ import java.io.InputStreamReader
 class MainActivity : BaseDrawerActivity() {
 
     companion object {
+        const val ITEM_CSV_HEADER = "barcode|itemId|article|material|color|size|name|description|category|price|sellPrice|discount|isSpecialPrice|stockQty|printQty|pricingId"
         const val COL_BARCODE = 0
         const val COL_ITEM_ID = 1
         const val COL_ARTICLE = 2
@@ -52,6 +59,7 @@ class MainActivity : BaseDrawerActivity() {
     private lateinit var tvBrandCode: TextView
     private lateinit var tvItemCount: TextView
     private lateinit var tvOpnameCount: TextView
+    private lateinit var btnStart: Button
     private lateinit var btnUploadCsv: Button
     private lateinit var btnDownloadDb: Button
     private lateinit var btnClearCollectedData: Button
@@ -66,7 +74,7 @@ class MainActivity : BaseDrawerActivity() {
 
     private val selectCsvLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            importCsv(it)
+            importItemCsv(it)
         }
     }
 
@@ -92,6 +100,7 @@ class MainActivity : BaseDrawerActivity() {
         tvBrandCode = findViewById(R.id.tvBrandCode)
         tvItemCount = findViewById(R.id.tvItemCount)
         tvOpnameCount = findViewById(R.id.tvOpnameCount)
+        btnStart = findViewById(R.id.btnStart)
         btnUploadCsv = findViewById(R.id.btnUploadCsv)
         btnDownloadDb = findViewById(R.id.btnDownloadDb)
         btnClearCollectedData = findViewById(R.id.btnClearCollectedData)
@@ -99,6 +108,9 @@ class MainActivity : BaseDrawerActivity() {
     }
 
     private fun setupListeners() {
+        btnStart.setOnClickListener {
+            startWorkingActivity()
+        }
         btnUploadCsv.setOnClickListener {
             selectCsvLauncher.launch("text/comma-separated-values")
         }
@@ -111,6 +123,27 @@ class MainActivity : BaseDrawerActivity() {
         btnClearItem.setOnClickListener {
             showClearItemDialog()
         }
+    }
+
+    private fun startWorkingActivity() {
+        val workingTypeName = prefs.getString(SettingActivity.KEY_WORKING_TYPE, WorkingTypes.NONE.name)
+        val workingType = try {
+            WorkingTypes.valueOf(workingTypeName ?: WorkingTypes.NONE.name)
+        } catch (e: Exception) {
+            WorkingTypes.NONE
+        }
+
+        val intent = when (workingType) {
+            WorkingTypes.OPNAME -> Intent(this, OpnameActivity::class.java)
+            WorkingTypes.RECEIVING -> Intent(this, ReceivingActivity::class.java)
+            WorkingTypes.TRANSFER -> Intent(this, TransferActivity::class.java)
+            WorkingTypes.PRINTLABEL -> Intent(this, PrintlabelActivity::class.java)
+            else -> {
+                Toast.makeText(this, "Silahkan pilih Working Type di menu Setting", Toast.LENGTH_SHORT).show()
+                null
+            }
+        }
+        intent?.let { startActivity(it) }
     }
 
     private fun showClearCollectedDataDialog() {
@@ -164,6 +197,14 @@ class MainActivity : BaseDrawerActivity() {
             .show()
     }
 
+    private fun showErrorDialog(title: String, message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
     override fun onResume() {
         super.onResume()
         displaySettings()
@@ -184,8 +225,11 @@ class MainActivity : BaseDrawerActivity() {
 
         if (workingType == WorkingTypes.NONE || sessionManager.isAdmin) {
             supportActionBar?.title = "Main"
+            btnStart.visibility = View.GONE
         } else {
             supportActionBar?.title = workingType.displayName
+            btnStart.visibility = View.VISIBLE
+            btnStart.text = "START ${workingType.displayName.uppercase()}"
         }
 
         tvSiteCode.text = siteCode
@@ -196,25 +240,32 @@ class MainActivity : BaseDrawerActivity() {
     }
 
     private fun updateCounts() {
+        val workingTypeName = prefs.getString(SettingActivity.KEY_WORKING_TYPE, WorkingTypes.NONE.name)
+        val workingType = try {
+            WorkingTypes.valueOf(workingTypeName ?: WorkingTypes.NONE.name)
+        } catch (e: Exception) {
+            WorkingTypes.NONE
+        }
+
         lifecycleScope.launch {
             val itemCount = withContext(Dispatchers.IO) { itemRepository.getCount() }
-            val opnameCount = withContext(Dispatchers.IO) { opnameRowRepository.getCount() }
+            val opnameCount = withContext(Dispatchers.IO) { opnameRowRepository.getCount(workingType) }
             
             tvItemCount.text = itemCount.toString()
             tvOpnameCount.text = opnameCount.toString()
         }
     }
 
-    private fun importCsv(uri: Uri) {
+    private fun importItemCsv(uri: Uri) {
         lifecycleScope.launch {
             try {
                 val (itemsWithBarcodes, failedCount) = withContext(Dispatchers.IO) {
-                    parseCsv(uri)
+                    parseItemCsv(uri)
                 }
                 
                 if (itemsWithBarcodes.isEmpty()) {
                     val msg = if (failedCount > 0) "Gagal: $failedCount baris tidak valid" else "File CSV kosong atau format salah"
-                    Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
+                    showErrorDialog("Impor Gagal", msg)
                     return@launch
                 }
 
@@ -232,29 +283,46 @@ class MainActivity : BaseDrawerActivity() {
                 updateCounts()
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(this@MainActivity, "Gagal mengimpor CSV: ${e.message}", Toast.LENGTH_LONG).show()
+                showErrorDialog("Error Impor CSV", e.message ?: "Terjadi kesalahan yang tidak diketahui")
             }
         }
     }
 
-    private fun parseCsv(uri: Uri): Pair<List<Pair<Item, Barcode>>, Int> {
+    private fun parseItemCsv(uri: Uri): Pair<List<Pair<Item, Barcode>>, Int> {
         val result = mutableListOf<Pair<Item, Barcode>>()
         var failedCount = 0
+
+        // 1. Ambil delimiter dari setting
+        val delimiterName = prefs.getString(SettingActivity.KEY_CSV_DELIMITER, CsvDelimiter.COMMA.name)
+        val selectedDelimiter = CsvDelimiter.entries.find { it.name == delimiterName } ?: CsvDelimiter.COMMA
+        val delimiterChar = selectedDelimiter.character
+
         contentResolver.openInputStream(uri)?.use { inputStream ->
             BufferedReader(InputStreamReader(inputStream)).use { reader ->
                 // Skip header
                 val header = reader.readLine()
+
+                // Normalisasi header (hapus spasi dan bandingkan dengan template)
+                // Kita bandingkan dengan mengganti delimiter di template sesuai dengan delimiter yang dipilih user
+                val expectedHeader = ITEM_CSV_HEADER.replace('|', delimiterChar)
+
+                if (header == null) {
+                    throw Exception("File CSV kosong.")
+                }
+
+                if (header.trim() != expectedHeader) {
+                    throw Exception("Format Header CSV tidak valid.\n\nPastikan header sesuai:\n$expectedHeader\n\nTemplate dapat dilihat di petunjuk aplikasi.")
+                }
+
                 var line: String? = reader.readLine()
                 while (line != null) {
                     if (line.isBlank()) {
                         line = reader.readLine()
                         continue
                     }
-                    
-                    // Coba deteksi delimiter (default pipe, fallback ke koma atau semicolon)
-                    var tokens = line.split("|")
-                    if (tokens.size < 2) tokens = line.split(",")
-                    if (tokens.size < 2) tokens = line.split(";")
+
+                    // 2. Gunakan delimiterChar yang didapat dari setting
+                    val tokens = line.split(delimiterChar)
 
                     if (tokens.size >= 2) { // Minimal ada barcode dan itemId
                         try {

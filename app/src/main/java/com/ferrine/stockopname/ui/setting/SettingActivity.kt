@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import com.ferrine.stockopname.R
 import com.ferrine.stockopname.data.db.AppDatabaseHelper
 import com.ferrine.stockopname.data.model.BarcodeScannerOptions
+import com.ferrine.stockopname.data.model.CsvDelimiter
 import com.ferrine.stockopname.data.model.PrinterOptions
 import com.ferrine.stockopname.data.model.WorkingTypes
 import com.ferrine.stockopname.utils.SessionManager
@@ -39,6 +40,7 @@ class SettingActivity : AppCompatActivity() {
     private lateinit var spWorkingType: AutoCompleteTextView
     private lateinit var spBarcodeReader: AutoCompleteTextView
     private lateinit var spPrinter: AutoCompleteTextView
+    private lateinit var spCsvDelimiter: AutoCompleteTextView
     private lateinit var btnResetData: Button
 
     private val sessionManager by lazy { SessionManager(this) }
@@ -88,6 +90,7 @@ class SettingActivity : AppCompatActivity() {
         spWorkingType = findViewById(R.id.spWorkingType)
         spBarcodeReader = findViewById(R.id.spBarcodeReader)
         spPrinter = findViewById(R.id.spPrinter)
+        spCsvDelimiter = findViewById(R.id.spCsvDelimiter)
         btnResetData = findViewById(R.id.btnResetData)
     }
 
@@ -160,6 +163,11 @@ class SettingActivity : AppCompatActivity() {
         val printerOptions = PrinterOptions.entries.map { it.displayName }
         val pAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, printerOptions)
         spPrinter.setAdapter(pAdapter)
+
+        // CSV Delimiter
+        val delimiterOptions = CsvDelimiter.entries.map { it.displayName }
+        val dAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, delimiterOptions)
+        spCsvDelimiter.setAdapter(dAdapter)
     }
 
     /**
@@ -184,6 +192,10 @@ class SettingActivity : AppCompatActivity() {
         val printerPrefix = prefs.getString(KEY_PRINTER_PREFIX, "")
         val printerOption = PrinterOptions.entries.find { it.prefix == printerPrefix } ?: PrinterOptions.NONE
         spPrinter.setText(printerOption.displayName, false)
+
+        val delimiterName = prefs.getString(KEY_CSV_DELIMITER, CsvDelimiter.COMMA.name)
+        val delimiterOption = CsvDelimiter.entries.find { it.name == delimiterName } ?: CsvDelimiter.COMMA
+        spCsvDelimiter.setText(delimiterOption.displayName, false)
     }
 
     /**
@@ -199,6 +211,9 @@ class SettingActivity : AppCompatActivity() {
         val printerDisplayName = spPrinter.text.toString()
         val selectedPrinter = PrinterOptions.entries.find { it.displayName == printerDisplayName } ?: PrinterOptions.NONE
 
+        val delimiterDisplayName = spCsvDelimiter.text.toString()
+        val selectedDelimiter = CsvDelimiter.entries.find { it.displayName == delimiterDisplayName } ?: CsvDelimiter.COMMA
+
         prefs.edit().apply {
             putString(KEY_SITE_CODE, etSiteCode.text.toString())
             putString(KEY_BRAND_CODE, etBrandCode.text.toString())
@@ -209,6 +224,7 @@ class SettingActivity : AppCompatActivity() {
             putString(KEY_WORKING_TYPE, selectedWorkingType.name)
             putString(KEY_BARCODE_READER, selectedBarcodeReader.name)
             putString(KEY_PRINTER_PREFIX, selectedPrinter.prefix)
+            putString(KEY_CSV_DELIMITER, selectedDelimiter.name)
             apply()
         }
     }
@@ -235,6 +251,7 @@ class SettingActivity : AppCompatActivity() {
         const val KEY_WORKING_TYPE = "working_type"
         const val KEY_BARCODE_READER = "barcode_reader"
         const val KEY_PRINTER_PREFIX = "printer_prefix"
+        const val KEY_CSV_DELIMITER = "csv_delimiter"
         const val KEY_DEVICE_ID = "device_id"
         const val KEY_USE_CENTRAL_SERVER = "use_central_server"
         const val KEY_SERVER_ADDRESS = "server_address"

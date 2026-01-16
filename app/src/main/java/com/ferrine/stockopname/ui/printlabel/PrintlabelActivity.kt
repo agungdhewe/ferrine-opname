@@ -3,11 +3,11 @@ package com.ferrine.stockopname.ui.printlabel
 import android.os.Bundle
 import com.ferrine.stockopname.BaseScannerActivity
 import com.ferrine.stockopname.R
-import com.ferrine.stockopname.data.model.PrintLabelMode
+import com.ferrine.stockopname.data.model.WorkingTypes
 
 class PrintlabelActivity : BaseScannerActivity() {
 
-    override var currentMode: PrintLabelMode = PrintLabelMode.PRINT_LABEL
+    override var currentWorkingType: WorkingTypes = WorkingTypes.PRINTLABEL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -41,7 +41,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Editable Content Area -->
+                <!-- Editable Content Area (Combined UI) -->
                 <LinearLayout
                     android:id="@+id/layoutEditContent"
                     android:layout_width="match_parent"
@@ -49,7 +49,8 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="12dp"
-                    android:background="?attr/colorSurface">
+                    android:background="@drawable/bg_rounded_light_grey"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <TextView
                         android:id="@+id/tvBoxCode"
@@ -64,6 +65,7 @@
                         android:ellipsize="end"
                         android:hint="Box / Shelf / Room"
                         android:textColor="@android:color/black"
+                        android:background="@android:color/transparent"
                         android:textSize="16sp"/>
 
                     <ImageButton
@@ -71,7 +73,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_typing"
-                        android:background="?attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         app:tint="?attr/colorPrimary"
                         android:padding="12dp"
                         android:scaleType="centerInside"

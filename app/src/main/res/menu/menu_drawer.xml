@@ -7,10 +7,7 @@
         android:title="Home"
         android:icon="@drawable/ic_home"/>
 
-    <item
-        android:id="@+id/menu_item"
-        android:title="Item"
-        android:icon="@drawable/ic_typing"/>
+
 
     <item
         android:id="@+id/menu_opname"
@@ -31,6 +28,16 @@
         android:id="@+id/menu_print_label"
         android:title="Print Label"
         android:icon="@drawable/ic_print"/>
+
+    <item
+        android:id="@+id/menu_item"
+        android:title="Item"
+        android:icon="@drawable/ic_item"/>
+
+    <item
+        android:id="@+id/menu_scanned_item"
+        android:title="Scanned Items"
+        android:icon="@drawable/ic_history"/>
 
     <item
         android:id="@+id/menu_user"
