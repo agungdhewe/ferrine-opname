@@ -42,6 +42,15 @@ class OpnameRowRepository(context: Context) : BaseDataRepository() {
         )
     }
 
+    fun cancelInsertedRow(timestamp: Long): Int {
+        val db = dbHelper.writableDatabase
+        return db.delete(
+            DbContract.OpnameTable.TABLE_NAME,
+            "${DbContract.OpnameTable.COLUMN_TIMESTAMP} = ?",
+            arrayOf(timestamp.toString())
+        )
+    }
+
     fun getCount(workingType: WorkingTypes): Long {
         val db = dbHelper.readableDatabase
         val cursor = db.rawQuery(

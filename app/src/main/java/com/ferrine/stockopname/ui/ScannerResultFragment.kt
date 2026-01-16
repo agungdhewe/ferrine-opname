@@ -88,6 +88,19 @@ class ScannerResultFragment : Fragment() {
         dialog.show()
     }
 
+
+    fun showErrorMessage(message: CharSequence?) {
+        tvErrorMessage?.apply {
+            if (message.isNullOrEmpty()) {
+                visibility = View.GONE
+            } else {
+                text = message
+                visibility = View.VISIBLE
+            }
+        }
+    }
+
+
     fun setError(message: CharSequence?) {
         tvErrorMessage?.apply {
             if (message.isNullOrEmpty()) {

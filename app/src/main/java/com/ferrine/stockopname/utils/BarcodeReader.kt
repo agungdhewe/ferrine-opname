@@ -100,7 +100,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
                         0.0 // Default jika error
                     }
                 }
-
+                
 				soundBarcodeFound()
 
                 // Setup callback untuk edit qty menggunakan function yang baru dibuat
@@ -123,15 +123,30 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
                         currentToast?.show()
 
 						val label = BarcodeLabel.createBarcodeLabel(barcode, item)
-						printBarcode(label)
+						try {
+                            printBarcode(label)
+                        } catch (e: Exception) {
+                            Log.e("BarcodeReader", "Print Error: ${e.message}")
+                            // Jika print gagal, batalkan insert
+                            withContext(Dispatchers.IO) {
+                                opnameRowRepository.cancelInsertedRow(timestamp)
+                            }
+                            soundBarcodeNotFound()
+
+                            // Update UI untuk menunjukkan qty kembali seperti semula
+                            val currentQty = withContext(Dispatchers.IO) {
+                                opnameRowRepository.getScannedQty(workingType, item.itemId)
+                            }
+                            resultFragment?.setData(barcode, item, currentQty, workingType)
+                            resultFragment?.showErrorMessage("Gagal Print: ${e.message}. Print label dibatalkan.".toHtml())
+                            return@launch
+                        }
 					}
 
 					WorkingTypes.OPNAME, WorkingTypes.RECEIVING, WorkingTypes.TRANSFER -> {
                         currentToast?.cancel()
                         currentToast = Toast.makeText(activity, "Inserting item $barcode...", Toast.LENGTH_SHORT)
                         currentToast?.show()
-
-
 					}
 
 					else -> {}
@@ -170,7 +185,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
 
                 // update tampilan result
                 resultFragment?.setData(barcode, item, totalScanned, workingType)
-                currentToast = Toast.makeText(activity, "$timestamp QtyScanned diset menjadi $newQty", Toast.LENGTH_SHORT)
+                currentToast = Toast.makeText(activity, "Qty berhasil diupdate", Toast.LENGTH_SHORT)
             } catch (e: Exception) {
                 Log.e("BarcodeReader", "Error updateQtyScanned: ${e.message}")
                 resultFragment?.setError("Kesalahan Database: ${e.localizedMessage}".toHtml())
