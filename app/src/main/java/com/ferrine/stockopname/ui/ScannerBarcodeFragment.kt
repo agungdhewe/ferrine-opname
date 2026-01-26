@@ -54,6 +54,7 @@ class ScannerBarcodeFragment : Fragment() {
 
 		btnSubmitBarcode.setOnClickListener {
 			processBarcode()
+            showKeyboard()
 		}
 	}
 
@@ -63,6 +64,13 @@ class ScannerBarcodeFragment : Fragment() {
 			(activity as? BaseScannerActivity)?.findBarcode(barcode)
 		}
 	}
+
+
+    private fun showKeyboard() {
+        val window = requireActivity().window
+        val controller = WindowInsetsControllerCompat(window, etBarcode)
+        controller.show(WindowInsetsCompat.Type.ime())
+    }
 
 	private fun setupKeyboardToggle() {
 		(activity as? BaseScannerActivity)?.btnShowKeyboard?.setOnClickListener {

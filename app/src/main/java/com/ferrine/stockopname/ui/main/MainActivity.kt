@@ -2,13 +2,11 @@ package com.ferrine.stockopname.ui.main
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import com.ferrine.stockopname.BaseDrawerActivity
@@ -30,22 +28,16 @@ class MainActivity : BaseDrawerActivity() {
     private lateinit var tvSiteCode: TextView
     private lateinit var tvBrandCode: TextView
     private lateinit var tvItemCount: TextView
+    private lateinit var tvOpnameRowCount: TextView
     private lateinit var tvOpnameLabel: TextView
     private lateinit var tvOpnameCount: TextView
     private lateinit var btnStart: Button
-    private lateinit var btnDownloadDb: Button
 
     private val itemRepository by lazy { ItemRepository(this) }
     private val opnameRowRepository by lazy { OpnameRowRepository(this) }
 
     private val prefs by lazy {
         getSharedPreferences(SettingActivity.PREFS_NAME, Context.MODE_PRIVATE)
-    }
-
-    private val createDbLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/x-sqlite3")) { uri: Uri? ->
-        uri?.let {
-            exportDatabase(it)
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,18 +55,15 @@ class MainActivity : BaseDrawerActivity() {
         tvSiteCode = findViewById(R.id.tvSiteCode)
         tvBrandCode = findViewById(R.id.tvBrandCode)
         tvItemCount = findViewById(R.id.tvItemCount)
+        tvOpnameRowCount = findViewById(R.id.tvOpnameRowCount)
         tvOpnameLabel = findViewById(R.id.tvOpnameLabel)
         tvOpnameCount = findViewById(R.id.tvOpnameCount)
         btnStart = findViewById(R.id.btnStart)
-        btnDownloadDb = findViewById(R.id.btnDownloadDb)
     }
 
     private fun setupListeners() {
         btnStart.setOnClickListener {
             startWorkingActivity()
-        }
-        btnDownloadDb.setOnClickListener {
-            createDbLauncher.launch("stockopname.db")
         }
     }
 
@@ -141,34 +130,12 @@ class MainActivity : BaseDrawerActivity() {
 
         lifecycleScope.launch {
             val itemCount = withContext(Dispatchers.IO) { itemRepository.getCount() }
+            val opnameRowCount = withContext(Dispatchers.IO) { opnameRowRepository.getCount(workingType) }
             val totalScanned = withContext(Dispatchers.IO) { opnameRowRepository.getTotalScannedQty(workingType) }
             
             tvItemCount.text = itemCount.toString()
+            tvOpnameRowCount.text = opnameRowCount.toString()
             tvOpnameCount.text = totalScanned.toString()
-        }
-    }
-
-    private fun exportDatabase(uri: Uri) {
-        lifecycleScope.launch {
-            try {
-                val dbFile = getDatabasePath("stockopname.db")
-                if (!dbFile.exists()) {
-                    Toast.makeText(this@MainActivity, "Database tidak ditemukan", Toast.LENGTH_SHORT).show()
-                    return@launch
-                }
-
-                withContext(Dispatchers.IO) {
-                    contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        dbFile.inputStream().use { inputStream ->
-                            inputStream.copyTo(outputStream)
-                        }
-                    }
-                }
-                Toast.makeText(this@MainActivity, "Database berhasil diekspor", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this@MainActivity, "Gagal mengekspor database: ${e.message}", Toast.LENGTH_LONG).show()
-            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.ferrine.stockopname.ui.setting
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,10 +9,12 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import com.ferrine.stockopname.R
 import com.ferrine.stockopname.data.db.AppDatabaseHelper
 import com.ferrine.stockopname.data.model.BarcodeScannerOptions
@@ -22,6 +25,9 @@ import com.ferrine.stockopname.utils.SessionManager
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingActivity : AppCompatActivity() {
 
@@ -41,12 +47,19 @@ class SettingActivity : AppCompatActivity() {
     private lateinit var spBarcodeReader: AutoCompleteTextView
     private lateinit var spPrinter: AutoCompleteTextView
     private lateinit var spCsvDelimiter: AutoCompleteTextView
+    private lateinit var btnDownloadDb: Button
     private lateinit var btnResetData: Button
 
     private val sessionManager by lazy { SessionManager(this) }
 
     private val prefs by lazy {
         getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val createDbLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/x-sqlite3")) { uri: Uri? ->
+        uri?.let {
+            exportDatabase(it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +104,14 @@ class SettingActivity : AppCompatActivity() {
         spBarcodeReader = findViewById(R.id.spBarcodeReader)
         spPrinter = findViewById(R.id.spPrinter)
         spCsvDelimiter = findViewById(R.id.spCsvDelimiter)
+        btnDownloadDb = findViewById(R.id.btnDownloadDb)
         btnResetData = findViewById(R.id.btnResetData)
     }
 
     private fun setupListeners() {
+        btnDownloadDb.setOnClickListener {
+            createDbLauncher.launch("stockopname.db")
+        }
         btnResetData.setOnClickListener {
             showResetConfirmationDialog()
         }
@@ -110,11 +127,24 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun showResetConfirmationDialog() {
+        val input = TextInputEditText(this)
+        val layout = TextInputLayout(this).apply {
+            setPadding(60, 20, 60, 0)
+            addView(input)
+        }
+        input.hint = "Ketik 'reset data'"
+
         AlertDialog.Builder(this)
             .setTitle("Reset Data")
-            .setMessage("Apakah Anda yakin ingin menghapus semua data transaksi dan master data? Tindakan ini tidak dapat dibatalkan.")
+            .setMessage("Apakah Anda yakin ingin menghapus semua data transaksi dan master data? Tindakan ini tidak dapat dibatalkan.\n\nKetik 'reset data' di bawah ini untuk konfirmasi:")
+            .setView(layout)
             .setPositiveButton("Ya, Reset") { _, _ ->
-                resetData()
+                val confirmationText = input.text.toString().trim()
+                if (confirmationText.equals("reset data", ignoreCase = true)) {
+                    resetData()
+                } else {
+                    Toast.makeText(this, "Konfirmasi gagal. Teks tidak sesuai.", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("Batal", null)
             .show()
@@ -127,6 +157,30 @@ class SettingActivity : AppCompatActivity() {
             Toast.makeText(this, "Data berhasil direset", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Gagal mereset data: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun exportDatabase(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val dbFile = getDatabasePath("stockopname.db")
+                if (!dbFile.exists()) {
+                    Toast.makeText(this@SettingActivity, "Database tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                withContext(Dispatchers.IO) {
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        dbFile.inputStream().use { inputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                    }
+                }
+                Toast.makeText(this@SettingActivity, "Database berhasil diekspor", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@SettingActivity, "Gagal mengekspor database: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -144,6 +198,9 @@ class SettingActivity : AppCompatActivity() {
         cbUseCentralServer.isEnabled = isAdmin
         updateServerAddressEnableState(cbUseCentralServer.isChecked)
 
+        // Tombol Download muncul jika sudah Login
+        btnDownloadDb.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+        
         // Tombol Reset Data hanya muncul jika Admin dan sudah Login
         btnResetData.visibility = if (isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }

@@ -186,6 +186,35 @@
                                 android:gravity="center">
 
                                 <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Total Rows"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvOpnameRowCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@android:color/black" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#EEEEEE"
+                                android:layout_marginHorizontal="8dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <TextView
                                     android:id="@+id/tvOpnameLabel"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -217,15 +246,6 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:cornerRadius="8dp" />
-
-                <Button
-                    android:id="@+id/btnDownloadDb"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Download DB"
-                    app:icon="@android:drawable/stat_sys_download"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             </LinearLayout>
         </ScrollView>

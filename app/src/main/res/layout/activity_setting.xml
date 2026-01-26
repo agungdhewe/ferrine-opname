@@ -164,14 +164,22 @@
                     android:inputType="textUri" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDownloadDb"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="32dp"
+                android:text="DOWNLOAD DATABASE"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp"
+                android:textColor="@color/white" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnResetData"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:text="RESET DATA"
                 android:textSize="16sp"
                 android:textStyle="bold"

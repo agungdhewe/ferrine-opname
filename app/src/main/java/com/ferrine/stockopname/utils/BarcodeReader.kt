@@ -90,6 +90,7 @@ class BarcodeReader(private val activity: BaseScannerActivity) {
                     return@launch // Hentikan proses, jangan lanjut ke cetak label
                 }
 
+
                 // Ambil total akumulasi qty yang sudah discan untuk item ini
                 val totalScanned = withContext(Dispatchers.IO) {
                     try {
